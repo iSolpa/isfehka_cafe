@@ -3,7 +3,7 @@
     <!-- isfehka_cafe/views/report_invoice_cafe.xml -->
     <template id="report_invoice_cafe"
               inherit_id="account.report_invoice_document">
-      <xpath expr="//div[@class='footer']" position="inside">
+      <xpath expr="." position="inside">
         <div t-if="o.hka_cufe" style="text-align:center;font-size:10px;" class="mt16">
           <strong>COMPROBANTE AUXILIAR DE FACTURA ELECTRÓNICA (C.A.F.E.)</strong><br/>
           RUC <t t-esc="o.company_id.vat"/> – <t t-esc="o.company_id.name"/><br/>
