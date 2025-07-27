@@ -3,7 +3,7 @@
     <!-- isfehka_cafe/static/src/xml/pos_ticket_cafe.xml -->
     <t t-inherit="point_of_sale.Receipt" t-inherit-mode="extension">
         <xpath expr="//div[@class='pos-receipt-body']" position="after">
-          <div class="centered">
+          <div t-if="receipt.hka_cufe" class="centered">
             <strong>CAFE – Comprobante Auxiliar</strong><br/>
             CUFE: <t t-esc="receipt.hka_cufe"/><br/>
             <img t-if="receipt.hka_cufe_qr"
