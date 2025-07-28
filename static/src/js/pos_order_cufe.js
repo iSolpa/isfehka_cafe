@@ -38,27 +38,24 @@ patch(PosOrder.prototype, {
     export_for_printing() {
         const result = super.export_for_printing(...arguments);
         
-        // Add CUFE data directly to result object for template access
+        // Add CUFE data to headerData for template access (working approach)
         if (this.hka_cufe) {
-            result.hka_cufe = this.hka_cufe;
+            result.headerData = result.headerData || {};
+            result.headerData.hka_cufe = this.hka_cufe;
             
             // Format QR code with proper data URL prefix
             if (this.hka_cufe_qr) {
-                result.hka_cufe_qr = `data:image/png;base64,${this.hka_cufe_qr}`;
+                result.headerData.hka_cufe_qr = `data:image/png;base64,${this.hka_cufe_qr}`;
             }
             
-            console.log("[ISFEHKA CAFE] Added CUFE data for order:", this.name, {
-                cufe: this.hka_cufe,
-                hasQr: !!this.hka_cufe_qr,
-                resultKeys: Object.keys(result)
-            });
+            console.log("[ISFEHKA CAFE] Added CUFE to headerData for order:", this.name);
         }
         
         console.log("[ISFEHKA CAFE] Export for printing:", {
             orderName: this.name,
             hasCufe: !!this.hka_cufe,
-            hasQrCode: !!this.hka_cufe_qr,
-            resultHasCufe: !!result.hka_cufe
+            headerHasCufe: !!(result.headerData && result.headerData.hka_cufe),
+            hasQrCode: !!(result.headerData && result.headerData.hka_cufe_qr)
         });
         
         return result;
