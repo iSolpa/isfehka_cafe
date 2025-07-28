@@ -22,7 +22,10 @@ patch(PosOrder.prototype, {
         }
         
         // Add tipo_documento for transaction type display (from HKA integration)
-        json.tipo_documento = this.account_move ? this.account_move.tipo_documento : '01';
+        console.log("[ISFEHKA CAFE] Debug - account_move:", this.account_move);
+        console.log("[ISFEHKA CAFE] Debug - account_move.tipo_documento:", this.account_move ? this.account_move.tipo_documento : 'NO ACCOUNT_MOVE');
+        
+        json.tipo_documento = this.account_move ? this.account_move.tipo_documento : '';
         
         // Get the display name for tipo_documento selection field
         const tipoDocumentoMap = {
@@ -36,7 +39,7 @@ patch(PosOrder.prototype, {
             '08': 'Factura de Zona Franca',
             '09': 'Factura de Reembolso'
         };
-        json.tipo_documento_name = tipoDocumentoMap[json.tipo_documento] || 'Factura de Operación Interna';
+        json.tipo_documento_name = json.tipo_documento ? tipoDocumentoMap[json.tipo_documento] || '' : '';
         
         return json;
     },
@@ -57,7 +60,8 @@ patch(PosOrder.prototype, {
         }
         
         // Store tipo_documento for transaction type display (from HKA integration)
-        this.tipo_documento = json.tipo_documento || '01';
+        console.log("[ISFEHKA CAFE] Debug init_from_JSON - json.tipo_documento:", json.tipo_documento);
+        this.tipo_documento = json.tipo_documento || '';
         
         // Get the display name for tipo_documento selection field
         const tipoDocumentoMap = {
@@ -71,14 +75,15 @@ patch(PosOrder.prototype, {
             '08': 'Factura de Zona Franca',
             '09': 'Factura de Reembolso'
         };
-        this.tipo_documento_name = json.tipo_documento_name || tipoDocumentoMap[this.tipo_documento] || 'Factura de Operación Interna';
+        this.tipo_documento_name = json.tipo_documento_name || (this.tipo_documento ? tipoDocumentoMap[this.tipo_documento] || '' : '');
     },
 
     export_for_printing() {
         const result = super.export_for_printing(...arguments);
         
         // Add tipo_documento for transaction type display (from HKA integration)
-        result.tipo_documento = this.tipo_documento || '01';
+        console.log("[ISFEHKA CAFE] Debug export_for_printing - this.tipo_documento:", this.tipo_documento);
+        result.tipo_documento = this.tipo_documento || '';
         
         // Get the display name for tipo_documento selection field
         const tipoDocumentoMap = {
@@ -92,7 +97,12 @@ patch(PosOrder.prototype, {
             '08': 'Factura de Zona Franca',
             '09': 'Factura de Reembolso'
         };
-        result.tipo_documento_name = this.tipo_documento_name || tipoDocumentoMap[result.tipo_documento] || 'Factura de Operación Interna';
+        result.tipo_documento_name = this.tipo_documento_name || (result.tipo_documento ? tipoDocumentoMap[result.tipo_documento] || '' : '');
+        
+        console.log("[ISFEHKA CAFE] Debug export_for_printing result:", {
+            tipo_documento: result.tipo_documento,
+            tipo_documento_name: result.tipo_documento_name
+        });
         
         // Add CUFE data to headerData for template access (working approach)
         if (this.hka_cufe) {

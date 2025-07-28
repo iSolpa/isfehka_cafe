@@ -14,9 +14,11 @@
                     </div>
                     
                     <!-- Transaction Type -->
-                    <div style="text-align: center; margin-bottom: 8px;">
-                        <t t-esc="props.data.tipo_documento_name or 'Factura de Operación Interna'"/>
-                    </div>
+                    <t t-if="props.data.tipo_documento_name">
+                        <div style="text-align: center; margin-bottom: 8px;">
+                            <t t-esc="props.data.tipo_documento_name"/>
+                        </div>
+                    </t>
                     
                     <!-- Protocol section -->
                     <t t-if="props.data.headerData.hka_nro_protocolo_autorizacion">
