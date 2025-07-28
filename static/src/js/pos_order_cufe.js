@@ -3,6 +3,7 @@
 import { PosOrder } from "@point_of_sale/app/models/pos_order";
 import { patch } from "@web/core/utils/patch";
 
+
 console.log("[ISFEHKA CAFE] Loading model patches for Odoo 18");
 
 patch(PosOrder.prototype, {
