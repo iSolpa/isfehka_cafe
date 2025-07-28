@@ -18,6 +18,7 @@ patch(PosOrder.prototype, {
             json.hka_cufe = this.hka_cufe;
             json.hka_cufe_qr = this.hka_cufe_qr;
             json.hka_nro_protocolo_autorizacion = this.hka_nro_protocolo_autorizacion;
+            json.hka_fecha_recepcion_dgi = this.hka_fecha_recepcion_dgi;
         }
         return json;
     },
@@ -34,6 +35,7 @@ patch(PosOrder.prototype, {
             this.hka_cufe = json.hka_cufe;
             this.hka_cufe_qr = json.hka_cufe_qr;
             this.hka_nro_protocolo_autorizacion = json.hka_nro_protocolo_autorizacion;
+            this.hka_fecha_recepcion_dgi = json.hka_fecha_recepcion_dgi;
         }
     },
 
@@ -45,6 +47,7 @@ patch(PosOrder.prototype, {
             result.headerData = result.headerData || {};
             result.headerData.hka_cufe = this.hka_cufe;
             result.headerData.hka_nro_protocolo_autorizacion = this.hka_nro_protocolo_autorizacion;
+            result.headerData.hka_fecha_recepcion_dgi = this.hka_fecha_recepcion_dgi;
             
             // Format QR image with proper data URL prefix (generated from official DGI URL)
             if (this.hka_cufe_qr) {

@@ -6,20 +6,41 @@
         <xpath expr="//div[@class='after-footer']" position="after">
             <!-- CAFE Section - Only show if CUFE exists -->
             <t t-if="props.data.headerData and props.data.headerData.hka_cufe">
-                <div class="cafe-section" style="margin-top: 15px; text-align: center; border-top: 2px dashed #000; padding-top: 10px;">
-                    <strong>CAFE - Comprobante Auxiliar de Factura Electrónica</strong><br/>
-                    <span style="font-size: 10px; word-break: break-all;">CUFE: <t t-esc="props.data.headerData.hka_cufe"/></span><br/>
+                <div class="cafe-section" style="margin-top: 10px; text-align: left; font-size: 9px; line-height: 1.2;">
+                    <!-- Protocol section -->
                     <t t-if="props.data.headerData.hka_nro_protocolo_autorizacion">
-                        <span style="font-size: 10px; word-break: break-all;">Protocolo: <t t-esc="props.data.headerData.hka_nro_protocolo_autorizacion"/></span><br/>
+                        <div style="margin-bottom: 3px;">Protocolo de autorización:</div>
+                        <div style="word-break: break-all; margin-bottom: 8px;"><t t-esc="props.data.headerData.hka_nro_protocolo_autorizacion"/></div>
                     </t>
+                    
+                    <!-- Authorization date section -->
+                    <t t-if="props.data.headerData.hka_fecha_recepcion_dgi">
+                        <div style="margin-bottom: 3px;">Fecha de Autorización: <t t-esc="props.data.headerData.hka_fecha_recepcion_dgi"/></div>
+                    </t>
+                    
+                    <!-- Verification instructions -->
+                    <div style="margin-bottom: 3px;">Consulte por la clave de acceso en: https://dgi-fep.mef.gob.pa/Consultas/FacturasPorCUFE</div>
+                    
+                    <!-- CUFE section -->
+                    <div style="margin-bottom: 3px;">Usando el CUFE:</div>
+                    <div style="word-break: break-all; margin-bottom: 8px;"><t t-esc="props.data.headerData.hka_cufe"/></div>
+                    
+                    <!-- QR code section -->
                     <t t-if="props.data.headerData.hka_cufe_qr">
-                        <div style="margin-top: 5px;">
-                            <div style="font-size: 8px; margin-bottom: 3px;">Escanee para verificar en DGI:</div>
-                            <img t-att-src="props.data.headerData.hka_cufe_qr" style="max-width: 100px; height: auto;"/>
+                        <div style="margin-bottom: 3px;">O escaneando el código QR:</div>
+                        <div style="text-align: center; margin: 8px 0;">
+                            <img t-att-src="props.data.headerData.hka_cufe_qr" style="max-width: 80px; height: auto;"/>
                         </div>
                     </t>
-                    <div style="font-size: 8px; margin-top: 3px;">Verifique en DGI Panamá</div>
-                    <div class="pos-receipt-right-align" style="margin-top:5px;">--------------------</div>
+                    
+                    <!-- Footer text -->
+                    <div style="font-size: 8px; text-align: center; margin-top: 8px;">GRACIAS POR SU COMPRA</div>
+                    <div style="font-size: 8px; text-align: center;">Documento validado por The Factory HKA Corp. con RUC
+                        155596713-2-2015, es Proveedor Autorizado Calificado, Resolución
+                        No. 201-9719 de 12/10/2021</div>
+                    
+                    <!-- Separator line -->
+                    <div class="pos-receipt-right-align" style="margin-top: 8px;">--------------------</div>
                 </div>
             </t>
         </xpath>
