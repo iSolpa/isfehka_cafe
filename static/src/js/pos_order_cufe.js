@@ -23,7 +23,20 @@ patch(PosOrder.prototype, {
         
         // Add tipo_documento for transaction type display (from HKA integration)
         json.tipo_documento = this.account_move ? this.account_move.tipo_documento : '01';
-        json.tipo_documento_name = this.account_move ? this.account_move.tipo_documento_name : 'Factura de Operación Interna';
+        
+        // Get the display name for tipo_documento selection field
+        const tipoDocumentoMap = {
+            '01': 'Factura de Operación Interna',
+            '02': 'Factura de Importación',
+            '03': 'Factura de Exportación',
+            '04': 'Nota de Crédito',
+            '05': 'Nota de Débito',
+            '06': 'Nota de Crédito Genérica',
+            '07': 'Nota de Débito Genérica',
+            '08': 'Factura de Zona Franca',
+            '09': 'Factura de Reembolso'
+        };
+        json.tipo_documento_name = tipoDocumentoMap[json.tipo_documento] || 'Factura de Operación Interna';
         
         return json;
     },
@@ -45,7 +58,20 @@ patch(PosOrder.prototype, {
         
         // Store tipo_documento for transaction type display (from HKA integration)
         this.tipo_documento = json.tipo_documento || '01';
-        this.tipo_documento_name = json.tipo_documento_name || 'Factura de Operación Interna';
+        
+        // Get the display name for tipo_documento selection field
+        const tipoDocumentoMap = {
+            '01': 'Factura de Operación Interna',
+            '02': 'Factura de Importación',
+            '03': 'Factura de Exportación',
+            '04': 'Nota de Crédito',
+            '05': 'Nota de Débito',
+            '06': 'Nota de Crédito Genérica',
+            '07': 'Nota de Débito Genérica',
+            '08': 'Factura de Zona Franca',
+            '09': 'Factura de Reembolso'
+        };
+        this.tipo_documento_name = json.tipo_documento_name || tipoDocumentoMap[this.tipo_documento] || 'Factura de Operación Interna';
     },
 
     export_for_printing() {
@@ -53,7 +79,20 @@ patch(PosOrder.prototype, {
         
         // Add tipo_documento for transaction type display (from HKA integration)
         result.tipo_documento = this.tipo_documento || '01';
-        result.tipo_documento_name = this.tipo_documento_name || 'Factura de Operación Interna';
+        
+        // Get the display name for tipo_documento selection field
+        const tipoDocumentoMap = {
+            '01': 'Factura de Operación Interna',
+            '02': 'Factura de Importación',
+            '03': 'Factura de Exportación',
+            '04': 'Nota de Crédito',
+            '05': 'Nota de Débito',
+            '06': 'Nota de Crédito Genérica',
+            '07': 'Nota de Débito Genérica',
+            '08': 'Factura de Zona Franca',
+            '09': 'Factura de Reembolso'
+        };
+        result.tipo_documento_name = this.tipo_documento_name || tipoDocumentoMap[result.tipo_documento] || 'Factura de Operación Interna';
         
         // Add CUFE data to headerData for template access (working approach)
         if (this.hka_cufe) {
