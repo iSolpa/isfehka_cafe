@@ -6,7 +6,7 @@
         <xpath expr="//div[@class='after-footer']" position="after">
             <!-- CAFE Section - Only show if CUFE exists -->
             <t t-if="props.data.headerData and props.data.headerData.hka_cufe">
-                <div class="cafe-section" style="margin-top: 10px; text-align: left; font-size: 9px; line-height: 1.2;">
+                <div class="cafe-section" style="margin-top: 10px; text-align: left; font-size: 12px; line-height: 1.2;">
                     <!-- DGI Title -->
                     <div style="text-align: center; font-weight: bold; margin-bottom: 8px;">
                         <div>DGI</div>
@@ -40,13 +40,13 @@
                     <t t-if="props.data.headerData.hka_cufe_qr">
                         <div style="margin-bottom: 3px;">O escaneando el código QR:</div>
                         <div style="text-align: center; margin: 8px 0;">
-                            <img t-att-src="props.data.headerData.hka_cufe_qr" style="width: 160px; height: 160px; display: block; margin: 0 auto;"/>
+                            <img t-att-src="props.data.headerData.hka_cufe_qr" style="width: 320px; height: 320px; display: block; margin: 0 auto;"/>
                         </div>
                     </t>
                     
                     <!-- Footer text -->
-                    <div style="font-size: 8px; text-align: center; margin-top: 8px;">GRACIAS POR SU COMPRA</div>
-                    <div style="font-size: 8px; text-align: center;">Documento validado por The Factory HKA Corp. con RUC
+                    <div style="font-size: 12px; text-align: center; margin-top: 8px;">GRACIAS POR SU COMPRA</div>
+                    <div style="font-size: 12px; text-align: center;">Documento validado por The Factory HKA Corp. con RUC
                         155596713-2-2015, es Proveedor Autorizado Calificado, Resolución
                         No. 201-9719 de 12/10/2021</div>
                     
