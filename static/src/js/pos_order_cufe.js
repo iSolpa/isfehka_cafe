@@ -38,7 +38,7 @@ patch(PosOrder.prototype, {
     export_for_printing() {
         const result = super.export_for_printing(...arguments);
         
-        // Add CUFE data to result for JavaScript-based injection
+        // Add CUFE data directly to result object for template access
         if (this.hka_cufe) {
             result.hka_cufe = this.hka_cufe;
             
@@ -47,23 +47,18 @@ patch(PosOrder.prototype, {
                 result.hka_cufe_qr = `data:image/png;base64,${this.hka_cufe_qr}`;
             }
             
-            // Inject CAFE section into receipt HTML
-            if (result.receipt_html) {
-                const cafeHtml = this._generateCafeHtml();
-                // Insert CAFE section before the closing div of pos-receipt
-                result.receipt_html = result.receipt_html.replace(
-                    /<\/div>\s*<\/div>\s*$/,
-                    cafeHtml + '</div></div>'
-                );
-            }
-            
-            console.log("[ISFEHKA CAFE] Added CUFE data for order:", this.name);
+            console.log("[ISFEHKA CAFE] Added CUFE data for order:", this.name, {
+                cufe: this.hka_cufe,
+                hasQr: !!this.hka_cufe_qr,
+                resultKeys: Object.keys(result)
+            });
         }
         
         console.log("[ISFEHKA CAFE] Export for printing:", {
             orderName: this.name,
             hasCufe: !!this.hka_cufe,
-            hasQrCode: !!this.hka_cufe_qr
+            hasQrCode: !!this.hka_cufe_qr,
+            resultHasCufe: !!result.hka_cufe
         });
         
         return result;
