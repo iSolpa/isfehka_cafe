@@ -38,26 +38,49 @@ patch(PosOrder.prototype, {
     export_for_printing() {
         const result = super.export_for_printing(...arguments);
         
-        // Add CUFE data to headerData for template access
+        // Add CUFE data to result for JavaScript-based injection
         if (this.hka_cufe) {
-            result.headerData = result.headerData || {};
-            result.headerData.hka_cufe = this.hka_cufe;
+            result.hka_cufe = this.hka_cufe;
             
             // Format QR code with proper data URL prefix
             if (this.hka_cufe_qr) {
-                result.headerData.hka_cufe_qr = `data:image/png;base64,${this.hka_cufe_qr}`;
+                result.hka_cufe_qr = `data:image/png;base64,${this.hka_cufe_qr}`;
             }
             
-            console.log("[ISFEHKA CAFE] Added CUFE to headerData for order:", this.name);
+            // Inject CAFE section into receipt HTML
+            if (result.receipt_html) {
+                const cafeHtml = this._generateCafeHtml();
+                // Insert CAFE section before the closing div of pos-receipt
+                result.receipt_html = result.receipt_html.replace(
+                    /<\/div>\s*<\/div>\s*$/,
+                    cafeHtml + '</div></div>'
+                );
+            }
+            
+            console.log("[ISFEHKA CAFE] Added CUFE data for order:", this.name);
         }
         
         console.log("[ISFEHKA CAFE] Export for printing:", {
             orderName: this.name,
             hasCufe: !!this.hka_cufe,
-            headerHasCufe: !!(result.headerData && result.headerData.hka_cufe),
-            hasQrCode: !!(result.headerData && result.headerData.hka_cufe_qr)
+            hasQrCode: !!this.hka_cufe_qr
         });
         
         return result;
+    },
+    
+    _generateCafeHtml() {
+        // Generate CAFE section HTML
+        const qrCodeHtml = this.hka_cufe_qr ? 
+            `<img src="${this.hka_cufe_qr}" style="max-width: 100px; margin-top: 5px;"/>` : '';
+        
+        return `
+            <div class="cafe-section" style="margin-top: 15px; text-align: center; border-top: 2px dashed #000; padding-top: 10px;">
+                <strong>CAFE - Comprobante Auxiliar de Factura Electrónica</strong><br/>
+                <span style="font-size: 10px; word-break: break-all;">CUFE: ${this.hka_cufe}</span><br/>
+                ${qrCodeHtml}
+                <div style="font-size: 8px; margin-top: 3px;">Verifique en DGI Panamá</div>
+            </div>
+        `;
     },
 });
