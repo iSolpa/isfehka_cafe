@@ -36,6 +36,7 @@ class AccountMove(models.Model):
                     'hka_cufe_qr': self.hka_cufe_qr_image,  # Use generated QR image from official URL
                     'hka_nro_protocolo_autorizacion': self.hka_nro_protocolo_autorizacion,
                     'hka_fecha_recepcion_dgi': self.hka_fecha_recepcion_dgi,
+                    'hka_tipo_documento': self.tipo_documento,  # Add document type for CAFE display
                 })
                 print(f"[ISFEHKA CAFE] Synced CUFE data to {len(self.pos_order_ids)} POS orders for invoice {self.name}")
             except Exception as e:

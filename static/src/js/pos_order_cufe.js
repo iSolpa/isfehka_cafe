@@ -19,13 +19,13 @@ patch(PosOrder.prototype, {
             json.hka_cufe_qr = this.hka_cufe_qr;
             json.hka_nro_protocolo_autorizacion = this.hka_nro_protocolo_autorizacion;
             json.hka_fecha_recepcion_dgi = this.hka_fecha_recepcion_dgi;
+            json.hka_tipo_documento = this.hka_tipo_documento;  // Add document type from synced data
         }
         
         // Add tipo_documento for transaction type display (from HKA integration)
-        console.log("[ISFEHKA CAFE] Debug - account_move:", this.account_move);
-        console.log("[ISFEHKA CAFE] Debug - account_move.tipo_documento:", this.account_move ? this.account_move.tipo_documento : 'NO ACCOUNT_MOVE');
+        console.log("[ISFEHKA CAFE] Debug - this.hka_tipo_documento:", this.hka_tipo_documento);
         
-        json.tipo_documento = this.account_move ? this.account_move.tipo_documento : '';
+        json.tipo_documento = this.hka_tipo_documento || '';
         
         // Get the display name for tipo_documento selection field
         const tipoDocumentoMap = {
@@ -57,11 +57,13 @@ patch(PosOrder.prototype, {
             this.hka_cufe_qr = json.hka_cufe_qr;
             this.hka_nro_protocolo_autorizacion = json.hka_nro_protocolo_autorizacion;
             this.hka_fecha_recepcion_dgi = json.hka_fecha_recepcion_dgi;
+            this.hka_tipo_documento = json.hka_tipo_documento;  // Store document type from synced data
         }
         
         // Store tipo_documento for transaction type display (from HKA integration)
         console.log("[ISFEHKA CAFE] Debug init_from_JSON - json.tipo_documento:", json.tipo_documento);
-        this.tipo_documento = json.tipo_documento || '';
+        console.log("[ISFEHKA CAFE] Debug init_from_JSON - json.hka_tipo_documento:", json.hka_tipo_documento);
+        this.tipo_documento = json.tipo_documento || json.hka_tipo_documento || '';
         
         // Get the display name for tipo_documento selection field
         const tipoDocumentoMap = {

@@ -8,7 +8,17 @@ class PosOrder(models.Model):
     hka_cufe = fields.Char(string='CUFE', help='Código Único de Factura Electrónica')
     hka_cufe_qr = fields.Binary(string='CUFE QR Image', help='QR code image generated from official DGI URL')
     hka_nro_protocolo_autorizacion = fields.Char(string='Número de Protocolo de Autorización', help='Número de protocolo de autorización de DGI')
-    hka_fecha_recepcion_dgi = fields.Datetime(string='Fecha de Recepción DGI', help='Fecha de autorización ante la DGI')
+    hka_fecha_recepcion_dgi = fields.Datetime(
+        string='Fecha de Recepción DGI',
+        readonly=True,
+        help='Fecha de autorización ante la DGI'
+    )
+    
+    hka_tipo_documento = fields.Char(
+        string='Tipo de Documento HKA',
+        readonly=True,
+        help='Tipo de documento fiscal de la factura relacionada'
+    )
 
     def get_cufe_data(self, pos_reference):
         """Get CUFE data for a specific POS order reference"""
