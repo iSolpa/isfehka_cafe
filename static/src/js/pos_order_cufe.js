@@ -1,11 +1,11 @@
 /** @odoo-module */
 
-import { Order } from "@point_of_sale/app/store/models";
+import { PosOrder } from "@point_of_sale/app/models/pos_order";
 import { patch } from "@web/core/utils/patch";
 
-console.log("[ISFEHKA CAFE] Loading model patches");
+console.log("[ISFEHKA CAFE] Loading model patches for Odoo 18");
 
-patch(Order.prototype, {
+patch(PosOrder.prototype, {
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
         console.log("[ISFEHKA CAFE] Exporting order as JSON:", {
@@ -36,17 +36,23 @@ patch(Order.prototype, {
     },
 
     export_for_printing() {
-        const res = super.export_for_printing(...arguments);
+        const result = super.export_for_printing(...arguments);
         
-        // Add CUFE data if available
-        res.hka_cufe = this.hka_cufe || null;
-        res.hka_cufe_qr = this.hka_cufe_qr || null;
+        // Add CUFE data to headerData for template access
+        if (this.hka_cufe) {
+            result.headerData = result.headerData || {};
+            result.headerData.hka_cufe = this.hka_cufe;
+            result.headerData.hka_cufe_qr = this.hka_cufe_qr;
+            
+            console.log("[ISFEHKA CAFE] Added CUFE to headerData for order:", this.name);
+        }
         
         console.log("[ISFEHKA CAFE] Export for printing:", {
             orderName: this.name,
-            hasCufe: !!res.hka_cufe
+            hasCufe: !!this.hka_cufe,
+            headerHasCufe: !!(result.headerData && result.headerData.hka_cufe)
         });
         
-        return res;
+        return result;
     },
 });

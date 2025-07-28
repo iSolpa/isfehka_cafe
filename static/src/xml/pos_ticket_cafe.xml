@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
-    <!-- isfehka_cafe/static/src/xml/pos_ticket_cafe.xml -->
-    <t t-inherit="point_of_sale.OrderReceipt" t-inherit-mode="extension">
-        <xpath expr="//div[hasclass('pos-receipt')]" position="inside">
-            <t t-if="receipt.hka_cufe">
-                <div class="pos-receipt-cafe centered">
-                    <strong>CAFE – Comprobante Auxiliar</strong><br/>
-                    CUFE: <t t-esc="receipt.hka_cufe"/><br/>
-                    <img t-if="receipt.hka_cufe_qr"
-                         t-att-src="'data:image/png;base64,' + receipt.hka_cufe_qr"
-                         style="width:90px;height:90px;"/><br/>
-                    Verifique en DGI
+    <t t-name="isfehka_cafe.ReceiptHeader" 
+       t-inherit="point_of_sale.ReceiptHeader" 
+       t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('pos-receipt-contact')]" position="after">
+            <!-- CAFE Section - Only show if CUFE exists -->
+            <t t-if="props.data.hka_cufe">
+                <div class="cafe-section" style="margin-top: 10px; text-align: center; border-top: 1px dashed #000; padding-top: 5px;">
+                    <strong>CAFE - Comprobante Auxiliar de Factura Electrónica</strong><br/>
+                    <span style="font-size: 10px;">CUFE: <t t-esc="props.data.hka_cufe"/></span><br/>
+                    <t t-if="props.data.hka_cufe_qr">
+                        <img t-att-src="props.data.hka_cufe_qr" style="max-width: 80px; margin-top: 3px;"/>
+                    </t>
                 </div>
             </t>
         </xpath>
