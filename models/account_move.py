@@ -23,8 +23,12 @@ class AccountMove(models.Model):
                 qrcode.make(url_tpl % move.hka_cufe).save(buf, format='PNG')
                 move.hka_cufe_qr = base64.b64encode(buf.getvalue())
                 
-                # Sync CUFE data to related POS orders
-                move._sync_cufe_to_pos_orders()
+                # Sync CUFE data to related POS orders (only if fields exist)
+                try:
+                    move._sync_cufe_to_pos_orders()
+                except Exception as e:
+                    # Fields may not exist yet if module hasn't been updated
+                    pass
             else:
                 move.hka_cufe_qr = False
     
