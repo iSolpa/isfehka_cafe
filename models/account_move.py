@@ -22,27 +22,21 @@ class AccountMove(models.Model):
                 buf = io.BytesIO()
                 qrcode.make(move.hka_qr).save(buf, format='PNG')
                 move.hka_cufe_qr_image = base64.b64encode(buf.getvalue())
-                
-                # Sync CUFE data to related POS orders (only if fields exist)
-                try:
-                    move._sync_cufe_to_pos_orders()
-                except Exception as e:
-                    # Fields may not exist yet if module hasn't been updated
-                    pass
             else:
                 move.hka_cufe_qr_image = False
 
-    @api.depends('hka_cufe', 'hka_qr')
     def _sync_cufe_to_pos_orders(self):
         """Sync CUFE data to related POS orders for CAFE display"""
-        for move in self:
-            if move.hka_cufe and hasattr(move, 'pos_order_ids') and move.pos_order_ids:
-                # Update related POS orders with official CUFE and QR data from HKA
-                try:
-                    move.pos_order_ids.write({
-                        'hka_cufe': move.hka_cufe,
-                        'hka_cufe_qr': move.hka_cufe_qr_image,  # Use generated QR image from official URL
-                    })
-                except Exception as e:
-                    # Fields may not exist yet if module hasn't been updated
-                    pass
+        self.ensure_one()
+        if self.hka_cufe and hasattr(self, 'pos_order_ids') and self.pos_order_ids:
+            # Update related POS orders with official CUFE and QR data from HKA
+            try:
+                self.pos_order_ids.write({
+                    'hka_cufe': self.hka_cufe,
+                    'hka_cufe_qr': self.hka_cufe_qr_image,  # Use generated QR image from official URL
+                })
+                print(f"[ISFEHKA CAFE] Synced CUFE data to {len(self.pos_order_ids)} POS orders for invoice {self.name}")
+            except Exception as e:
+                # Fields may not exist yet if module hasn't been updated
+                print(f"[ISFEHKA CAFE] Error syncing CUFE data: {e}")
+                pass

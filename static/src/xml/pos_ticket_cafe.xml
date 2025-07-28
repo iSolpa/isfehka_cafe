@@ -5,14 +5,14 @@
        t-inherit-mode="extension">
         <xpath expr="." position="after">
             <!-- CAFE Section - Only show if CUFE exists -->
-            <t t-if="props.data.hka_cufe">
+            <t t-if="props.data.headerData and props.data.headerData.hka_cufe">
                 <div class="cafe-section" style="margin-top: 15px; text-align: center; border-top: 2px dashed #000; padding-top: 10px;">
                     <strong>CAFE - Comprobante Auxiliar de Factura Electrónica</strong><br/>
-                    <span style="font-size: 10px; word-break: break-all;">CUFE: <t t-esc="props.data.hka_cufe"/></span><br/>
-                    <t t-if="props.data.hka_cufe_qr">
+                    <span style="font-size: 10px; word-break: break-all;">CUFE: <t t-esc="props.data.headerData.hka_cufe"/></span><br/>
+                    <t t-if="props.data.headerData.hka_cufe_qr">
                         <div style="margin-top: 5px;">
                             <div style="font-size: 8px; margin-bottom: 3px;">Escanee para verificar en DGI:</div>
-                            <img t-att-src="props.data.hka_cufe_qr" style="max-width: 100px; height: auto;"/>
+                            <img t-att-src="props.data.headerData.hka_cufe_qr" style="max-width: 100px; height: auto;"/>
                         </div>
                     </t>
                     <div style="font-size: 8px; margin-top: 3px;">Verifique en DGI Panamá</div>
