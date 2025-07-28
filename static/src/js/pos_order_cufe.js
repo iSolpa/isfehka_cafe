@@ -85,7 +85,14 @@ patch(PosOrder.prototype, {
         
         // Add tipo_documento for transaction type display (from HKA integration)
         console.log("[ISFEHKA CAFE] Debug export_for_printing - this.tipo_documento:", this.tipo_documento);
-        result.tipo_documento = this.tipo_documento || '';
+        console.log("[ISFEHKA CAFE] Debug export_for_printing - this.hka_tipo_documento:", this.hka_tipo_documento);
+        console.log("[ISFEHKA CAFE] Debug export_for_printing - all HKA fields:", {
+            hka_cufe: this.hka_cufe,
+            hka_tipo_documento: this.hka_tipo_documento,
+            hka_nro_protocolo_autorizacion: this.hka_nro_protocolo_autorizacion,
+            hka_fecha_recepcion_dgi: this.hka_fecha_recepcion_dgi
+        });
+        result.tipo_documento = this.hka_tipo_documento || this.tipo_documento || '';
         
         // Get the display name for tipo_documento selection field
         const tipoDocumentoMap = {
