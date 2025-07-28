@@ -7,6 +7,17 @@
             <!-- CAFE Section - Only show if CUFE exists -->
             <t t-if="props.data.headerData and props.data.headerData.hka_cufe">
                 <div class="cafe-section" style="margin-top: 10px; text-align: left; font-size: 9px; line-height: 1.2;">
+                    <!-- DGI Title -->
+                    <div style="text-align: center; font-weight: bold; margin-bottom: 8px;">
+                        <div>DGI</div>
+                        <div>Comprobante Auxiliar de Factura Electrónica</div>
+                    </div>
+                    
+                    <!-- Transaction Type -->
+                    <div style="text-align: center; margin-bottom: 8px;">
+                        <t t-esc="props.data.tipo_documento_name or 'Factura de Operación Interna'"/>
+                    </div>
+                    
                     <!-- Protocol section -->
                     <t t-if="props.data.headerData.hka_nro_protocolo_autorizacion">
                         <div style="margin-bottom: 3px;">Protocolo de autorización:</div>
@@ -29,7 +40,7 @@
                     <t t-if="props.data.headerData.hka_cufe_qr">
                         <div style="margin-bottom: 3px;">O escaneando el código QR:</div>
                         <div style="text-align: center; margin: 8px 0;">
-                            <img t-att-src="props.data.headerData.hka_cufe_qr" style="max-width: 80px; height: auto;"/>
+                            <img t-att-src="props.data.headerData.hka_cufe_qr" style="width: 160px; height: 160px; display: block; margin: 0 auto;"/>
                         </div>
                     </t>
                     

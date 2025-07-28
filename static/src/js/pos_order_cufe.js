@@ -20,6 +20,11 @@ patch(PosOrder.prototype, {
             json.hka_nro_protocolo_autorizacion = this.hka_nro_protocolo_autorizacion;
             json.hka_fecha_recepcion_dgi = this.hka_fecha_recepcion_dgi;
         }
+        
+        // Add tipo_documento for transaction type display (from HKA integration)
+        json.tipo_documento = this.account_move ? this.account_move.tipo_documento : '01';
+        json.tipo_documento_name = this.account_move ? this.account_move.tipo_documento_name : 'Factura de Operación Interna';
+        
         return json;
     },
 
@@ -37,10 +42,18 @@ patch(PosOrder.prototype, {
             this.hka_nro_protocolo_autorizacion = json.hka_nro_protocolo_autorizacion;
             this.hka_fecha_recepcion_dgi = json.hka_fecha_recepcion_dgi;
         }
+        
+        // Store tipo_documento for transaction type display (from HKA integration)
+        this.tipo_documento = json.tipo_documento || '01';
+        this.tipo_documento_name = json.tipo_documento_name || 'Factura de Operación Interna';
     },
 
     export_for_printing() {
         const result = super.export_for_printing(...arguments);
+        
+        // Add tipo_documento for transaction type display (from HKA integration)
+        result.tipo_documento = this.tipo_documento || '01';
+        result.tipo_documento_name = this.tipo_documento_name || 'Factura de Operación Interna';
         
         // Add CUFE data to headerData for template access (working approach)
         if (this.hka_cufe) {
