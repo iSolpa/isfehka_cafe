@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
-    <t t-name="isfehka_cafe.ReceiptHeader" 
-       t-inherit="point_of_sale.ReceiptHeader" 
+    <t t-name="isfehka_cafe.ReceiptFooter" 
+       t-inherit="point_of_sale.ReceiptFooter" 
        t-inherit-mode="extension">
-        <xpath expr="//div[hasclass('pos-receipt-contact')]" position="after">
+        <xpath expr="." position="after">
             <!-- CAFE Section - Only show if CUFE exists -->
             <t t-if="props.data.hka_cufe">
-                <div class="cafe-section" style="margin-top: 10px; text-align: center; border-top: 1px dashed #000; padding-top: 5px;">
+                <div class="cafe-section" style="margin-top: 15px; text-align: center; border-top: 2px dashed #000; padding-top: 10px;">
                     <strong>CAFE - Comprobante Auxiliar de Factura Electrónica</strong><br/>
-                    <span style="font-size: 10px;">CUFE: <t t-esc="props.data.hka_cufe"/></span><br/>
+                    <span style="font-size: 10px; word-break: break-all;">CUFE: <t t-esc="props.data.hka_cufe"/></span><br/>
                     <t t-if="props.data.hka_cufe_qr">
-                        <img t-att-src="props.data.hka_cufe_qr" style="max-width: 80px; margin-top: 3px;"/>
+                        <img t-att-src="props.data.hka_cufe_qr" style="max-width: 100px; margin-top: 5px;"/>
                     </t>
+                    <div style="font-size: 8px; margin-top: 3px;">Verifique en DGI Panamá</div>
                 </div>
             </t>
         </xpath>
