@@ -22,5 +22,18 @@ class AccountMove(models.Model):
                 buf = io.BytesIO()
                 qrcode.make(url_tpl % move.hka_cufe).save(buf, format='PNG')
                 move.hka_cufe_qr = base64.b64encode(buf.getvalue())
+                
+                # Sync CUFE data to related POS orders
+                move._sync_cufe_to_pos_orders()
             else:
                 move.hka_cufe_qr = False
+    
+    def _sync_cufe_to_pos_orders(self):
+        """Sync CUFE data to related POS orders for CAFE display"""
+        self.ensure_one()
+        if hasattr(self, 'pos_order_ids') and self.pos_order_ids:
+            # Update related POS orders with CUFE data
+            self.pos_order_ids.write({
+                'hka_cufe': self.hka_cufe,
+                'hka_cufe_qr': self.hka_cufe_qr,
+            })
