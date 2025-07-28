@@ -17,6 +17,7 @@ patch(PosOrder.prototype, {
             console.log("[ISFEHKA CAFE] Including CUFE data in export for order:", this.name);
             json.hka_cufe = this.hka_cufe;
             json.hka_cufe_qr = this.hka_cufe_qr;
+            json.hka_nro_protocolo_autorizacion = this.hka_nro_protocolo_autorizacion;
         }
         return json;
     },
@@ -32,6 +33,7 @@ patch(PosOrder.prototype, {
             console.log("[ISFEHKA CAFE] Found CUFE data in JSON for order:", json.name);
             this.hka_cufe = json.hka_cufe;
             this.hka_cufe_qr = json.hka_cufe_qr;
+            this.hka_nro_protocolo_autorizacion = json.hka_nro_protocolo_autorizacion;
         }
     },
 
@@ -42,6 +44,7 @@ patch(PosOrder.prototype, {
         if (this.hka_cufe) {
             result.headerData = result.headerData || {};
             result.headerData.hka_cufe = this.hka_cufe;
+            result.headerData.hka_nro_protocolo_autorizacion = this.hka_nro_protocolo_autorizacion;
             
             // Format QR image with proper data URL prefix (generated from official DGI URL)
             if (this.hka_cufe_qr) {

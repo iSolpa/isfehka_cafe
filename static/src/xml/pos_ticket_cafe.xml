@@ -9,6 +9,9 @@
                 <div class="cafe-section" style="margin-top: 15px; text-align: center; border-top: 2px dashed #000; padding-top: 10px;">
                     <strong>CAFE - Comprobante Auxiliar de Factura Electrónica</strong><br/>
                     <span style="font-size: 10px; word-break: break-all;">CUFE: <t t-esc="props.data.headerData.hka_cufe"/></span><br/>
+                    <t t-if="props.data.headerData.hka_nro_protocolo_autorizacion">
+                        <span style="font-size: 10px; word-break: break-all;">Protocolo: <t t-esc="props.data.headerData.hka_nro_protocolo_autorizacion"/></span><br/>
+                    </t>
                     <t t-if="props.data.headerData.hka_cufe_qr">
                         <div style="margin-top: 5px;">
                             <div style="font-size: 8px; margin-bottom: 3px;">Escanee para verificar en DGI:</div>
@@ -16,6 +19,7 @@
                         </div>
                     </t>
                     <div style="font-size: 8px; margin-top: 3px;">Verifique en DGI Panamá</div>
+                    <div class="pos-receipt-right-align" style="margin-top:5px;">--------------------</div>
                 </div>
             </t>
         </xpath>
