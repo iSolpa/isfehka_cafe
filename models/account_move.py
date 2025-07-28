@@ -1,43 +1,29 @@
 # isfehka_cafe/models/account_move.py
-from odoo import models, fields, api
-import qrcode, base64, io
+from odoo import models, api
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    hka_cufe_qr = fields.Binary(
-        string='QR CUFE',
-        readonly=True,
-        compute='_compute_hka_cufe_qr',
-        store=True,
-        attachment=True,
-    )
+    def write(self, vals):
+        """Override write to sync CUFE data when HKA fields are updated"""
+        result = super().write(vals)
+        
+        # If CUFE or QR fields are updated, sync to related POS orders
+        if 'hka_cufe' in vals or 'hka_qr' in vals:
+            self._sync_cufe_to_pos_orders()
+        
+        return result
 
-    @api.depends('hka_cufe')
-    def _compute_hka_cufe_qr(self):
-        """Encode CUFE → https://dgi-fep.mef.gob.pa/consultar?cufe=…"""
-        url_tpl = 'https://dgi-fep.mef.gob.pa/consultar?cufe=%s'
+    def _sync_cufe_to_pos_orders(self):
+        """Sync CUFE data to related POS orders for CAFE display"""
         for move in self:
-            if move.hka_cufe:
-                buf = io.BytesIO()
-                qrcode.make(url_tpl % move.hka_cufe).save(buf, format='PNG')
-                move.hka_cufe_qr = base64.b64encode(buf.getvalue())
-                
-                # Sync CUFE data to related POS orders (only if fields exist)
+            if move.hka_cufe and hasattr(move, 'pos_order_ids') and move.pos_order_ids:
+                # Update related POS orders with CUFE data using official QR from isfehka
                 try:
-                    move._sync_cufe_to_pos_orders()
+                    move.pos_order_ids.write({
+                        'hka_cufe': move.hka_cufe,
+                        'hka_cufe_qr': move.hka_qr,  # Use official QR from HKA service
+                    })
                 except Exception as e:
                     # Fields may not exist yet if module hasn't been updated
                     pass
-            else:
-                move.hka_cufe_qr = False
-    
-    def _sync_cufe_to_pos_orders(self):
-        """Sync CUFE data to related POS orders for CAFE display"""
-        self.ensure_one()
-        if hasattr(self, 'pos_order_ids') and self.pos_order_ids:
-            # Update related POS orders with CUFE data
-            self.pos_order_ids.write({
-                'hka_cufe': self.hka_cufe,
-                'hka_cufe_qr': self.hka_cufe_qr,
-            })
