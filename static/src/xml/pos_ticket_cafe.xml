@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
     <t t-name="isfehka_cafe.ReceiptFooter" 
-       t-inherit="point_of_sale.ReceiptFooter" 
+       t-inherit="point_of_sale.OrderReceipt" 
        t-inherit-mode="extension">
-        <xpath expr="." position="after">
+        <xpath expr="//div[@class='after-footer']" position="after">
             <!-- CAFE Section - Only show if CUFE exists -->
             <t t-if="props.data.headerData and props.data.headerData.hka_cufe">
                 <div class="cafe-section" style="margin-top: 15px; text-align: center; border-top: 2px dashed #000; padding-top: 10px;">
