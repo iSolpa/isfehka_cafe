@@ -43,19 +43,30 @@ patch(PosOrder.prototype, {
             result.headerData = result.headerData || {};
             result.headerData.hka_cufe = this.hka_cufe;
             
-            // Format QR code with proper data URL prefix
+            // Handle QR code - check if it's official HKA QR or custom generated
             if (this.hka_cufe_qr) {
-                result.headerData.hka_cufe_qr = `data:image/png;base64,${this.hka_cufe_qr}`;
+                // If it's already a data URL, use as is; otherwise add prefix
+                if (this.hka_cufe_qr.startsWith('data:')) {
+                    result.headerData.hka_cufe_qr = this.hka_cufe_qr;
+                } else {
+                    result.headerData.hka_cufe_qr = `data:image/png;base64,${this.hka_cufe_qr}`;
+                }
             }
             
-            console.log("[ISFEHKA CAFE] Added CUFE to headerData for order:", this.name);
+            console.log("[ISFEHKA CAFE] Added CUFE to headerData for order:", this.name, {
+                cufe: this.hka_cufe,
+                qrLength: this.hka_cufe_qr ? this.hka_cufe_qr.length : 0,
+                qrPrefix: this.hka_cufe_qr ? this.hka_cufe_qr.substring(0, 50) : 'none'
+            });
         }
         
         console.log("[ISFEHKA CAFE] Export for printing:", {
             orderName: this.name,
             hasCufe: !!this.hka_cufe,
             headerHasCufe: !!(result.headerData && result.headerData.hka_cufe),
-            hasQrCode: !!(result.headerData && result.headerData.hka_cufe_qr)
+            hasQrCode: !!(result.headerData && result.headerData.hka_cufe_qr),
+            qrDataType: result.headerData && result.headerData.hka_cufe_qr ? 
+                (result.headerData.hka_cufe_qr.startsWith('data:') ? 'dataURL' : 'raw') : 'none'
         });
         
         return result;
