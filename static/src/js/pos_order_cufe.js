@@ -5,9 +5,6 @@ import { patch } from "@web/core/utils/patch";
 
 console.log("[ISFEHKA CAFE] Loading model patches for Odoo 18");
 
-// Store reference to inject CAFE after printing
-let cafeInjectionTimer = null;
-
 patch(PosOrder.prototype, {
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
@@ -41,66 +38,37 @@ patch(PosOrder.prototype, {
     export_for_printing() {
         const result = super.export_for_printing(...arguments);
         
-        // Store CUFE data for DOM injection after printing
+        // Add CUFE data to headerData for template access
         if (this.hka_cufe) {
-            const cafeData = {
-                cufe: this.hka_cufe,
-                qr: this.hka_cufe_qr
-            };
+            result.headerData = result.headerData || {};
+            result.headerData.hka_cufe = this.hka_cufe;
             
-            // Format QR code properly
-            if (cafeData.qr && !cafeData.qr.startsWith('data:')) {
-                cafeData.qr = `data:image/png;base64,${cafeData.qr}`;
+            // Handle QR code - check if it's official HKA QR or custom generated
+            if (this.hka_cufe_qr) {
+                // If it's already a data URL, use as is; otherwise add prefix
+                if (this.hka_cufe_qr.startsWith('data:')) {
+                    result.headerData.hka_cufe_qr = this.hka_cufe_qr;
+                } else {
+                    result.headerData.hka_cufe_qr = `data:image/png;base64,${this.hka_cufe_qr}`;
+                }
             }
             
-            console.log("[ISFEHKA CAFE] Preparing CAFE injection for order:", this.name, {
-                cufe: cafeData.cufe,
-                hasQr: !!cafeData.qr
+            console.log("[ISFEHKA CAFE] Added CUFE to headerData for order:", this.name, {
+                cufe: this.hka_cufe,
+                qrLength: this.hka_cufe_qr ? this.hka_cufe_qr.length : 0,
+                qrPrefix: this.hka_cufe_qr ? this.hka_cufe_qr.substring(0, 50) : 'none'
             });
-            
-            // Schedule DOM injection after a short delay
-            if (cafeInjectionTimer) clearTimeout(cafeInjectionTimer);
-            cafeInjectionTimer = setTimeout(() => {
-                this._injectCafeSection(cafeData);
-            }, 500);
         }
+        
+        console.log("[ISFEHKA CAFE] Export for printing:", {
+            orderName: this.name,
+            hasCufe: !!this.hka_cufe,
+            headerHasCufe: !!(result.headerData && result.headerData.hka_cufe),
+            hasQrCode: !!(result.headerData && result.headerData.hka_cufe_qr),
+            qrDataType: result.headerData && result.headerData.hka_cufe_qr ? 
+                (result.headerData.hka_cufe_qr.startsWith('data:') ? 'dataURL' : 'raw') : 'none'
+        });
         
         return result;
-    },
-    
-    _injectCafeSection(cafeData) {
-        console.log("[ISFEHKA CAFE] Attempting to inject CAFE section");
-        
-        // Find the receipt container
-        const receiptContainer = document.querySelector('.pos-receipt, .receipt, .o_pos_receipt');
-        if (!receiptContainer) {
-            console.warn("[ISFEHKA CAFE] Receipt container not found");
-            return;
-        }
-        
-        // Check if CAFE section already exists
-        if (receiptContainer.querySelector('.cafe-section')) {
-            console.log("[ISFEHKA CAFE] CAFE section already exists");
-            return;
-        }
-        
-        // Create CAFE section
-        const cafeDiv = document.createElement('div');
-        cafeDiv.className = 'cafe-section';
-        cafeDiv.style.cssText = 'margin-top: 15px; text-align: center; border-top: 2px dashed #000; padding-top: 10px;';
-        
-        const qrHtml = cafeData.qr ? 
-            `<img src="${cafeData.qr}" style="max-width: 100px; margin-top: 5px;"/>` : '';
-        
-        cafeDiv.innerHTML = `
-            <strong>CAFE - Comprobante Auxiliar de Factura Electrónica</strong><br/>
-            <span style="font-size: 10px; word-break: break-all;">CUFE: ${cafeData.cufe}</span><br/>
-            ${qrHtml}
-            <div style="font-size: 8px; margin-top: 3px;">Verifique en DGI Panamá</div>
-        `;
-        
-        // Append to receipt
-        receiptContainer.appendChild(cafeDiv);
-        console.log("[ISFEHKA CAFE] CAFE section injected successfully");
     },
 });
