@@ -6,7 +6,7 @@ class PosOrder(models.Model):
     
     # CUFE fields for Panama DGI CAFE integration
     hka_cufe = fields.Char(string='CUFE', help='Código Único de Factura Electrónica')
-    hka_cufe_qr = fields.Text(string='CUFE QR Code', help='QR Code for CUFE verification')
+    hka_cufe_qr = fields.Binary(string='CUFE QR Image', help='QR code image generated from official DGI URL')
 
     def get_cufe_data(self, pos_reference):
         """Get CUFE data for a specific POS order reference"""
