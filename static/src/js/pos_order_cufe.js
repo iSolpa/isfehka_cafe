@@ -82,7 +82,14 @@ patch(Order.prototype, {
     },
 
     async export_for_printing() {
-        const result = super.export_for_printing(...arguments);
+        // Call parent's export_for_printing - it might be async too
+        const result = await super.export_for_printing(...arguments);
+        
+        // Ensure result has proper structure
+        if (!result) {
+            console.error("[ISFEHKA CAFE] export_for_printing returned null/undefined from parent");
+            return result;
+        }
         
         // If order has server_id but no CUFE, try to fetch it from backend
         if (this.server_id && !this.hka_cufe) {
