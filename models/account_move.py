@@ -47,17 +47,22 @@ class AccountMove(models.Model):
     def _sync_cufe_to_pos_orders(self):
         """Sync CUFE data to related POS orders for CAFE display"""
         self.ensure_one()
-        if self.hka_cufe and hasattr(self, 'pos_order_ids') and self.pos_order_ids:
-            # Update related POS orders with official CUFE and QR data from HKA
+        if not self.hka_cufe:
+            return
+            
+        # Find POS orders that reference this invoice
+        pos_orders = self.env['pos.order'].search([('account_move', '=', self.id)])
+        
+        if pos_orders:
             try:
-                self.pos_order_ids.write({
+                pos_orders.write({
                     'hka_cufe': self.hka_cufe,
                     'hka_cufe_qr': self.hka_cufe_qr_image,  # Use generated QR image from official URL
                     'hka_nro_protocolo_autorizacion': self.hka_nro_protocolo_autorizacion,
                     'hka_fecha_recepcion_dgi': self.hka_fecha_recepcion_dgi,
                     'hka_tipo_documento': self.tipo_documento,  # Add document type for CAFE display
                 })
-                _logger.info(f"[ISFEHKA CAFE] Synced CUFE data to {len(self.pos_order_ids)} POS orders for invoice {self.name}")
+                _logger.info(f"[ISFEHKA CAFE] Synced CUFE data to {len(pos_orders)} POS orders for invoice {self.name}")
             except Exception as e:
                 # Fields may not exist yet if pos_order module hasn't been updated
                 _logger.warning(f"[ISFEHKA CAFE] Could not sync CUFE data to POS orders: {e}")

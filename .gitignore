@@ -5,3 +5,4 @@ __pycache__/__init__.cpython-312.pyc
 models/__pycache__/account_move.cpython-312.pyc
 models/__pycache__/pos_order.cpython-312.pyc
 BUGFIXES.md
+POS_SYNC_FIX.md

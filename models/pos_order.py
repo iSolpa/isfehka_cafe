@@ -19,6 +19,18 @@ class PosOrder(models.Model):
         readonly=True,
         help='Tipo de documento fiscal de la factura relacionada'
     )
+    
+    def _export_for_ui(self, order):
+        """Add CUFE fields to order export for POS UI"""
+        result = super(PosOrder, self)._export_for_ui(order)
+        result.update({
+            'hka_cufe': order.hka_cufe,
+            'hka_cufe_qr': order.hka_cufe_qr,
+            'hka_nro_protocolo_autorizacion': order.hka_nro_protocolo_autorizacion,
+            'hka_fecha_recepcion_dgi': order.hka_fecha_recepcion_dgi and order.hka_fecha_recepcion_dgi.isoformat(),
+            'hka_tipo_documento': order.hka_tipo_documento,
+        })
+        return result
 
     def get_cufe_data(self, pos_reference):
         """Get CUFE data for a specific POS order reference"""
