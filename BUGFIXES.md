@@ -68,8 +68,54 @@ if result['data'].get('fechaRecepcionDGI'):
 'hka_fecha_recepcion_dgi': fecha_recepcion,
 ```
 
+### Issue 3: Data Loss on Field Parse Failure (CRITICAL)
+**Problem:**
+- When HKA successfully processes invoice and returns data
+- But local Odoo field write fails (e.g., date parsing error)
+- Entire transaction gets rolled back and invoice is DELETED
+- Invoice exists in DGI but not in Odoo
+- Fiscal document number is consumed but data is lost
+
+**Impact:**
+- Invoice `0000000003` was accepted by DGI with CUFE
+- But deleted from Odoo due to date parse error
+- Cannot recover invoice data
+- Fiscal sequence out of sync
+
+**Fix:**
+- Split write operations into critical and optional sections
+- Save CUFE, status, QR, protocol FIRST with immediate commit
+- Handle optional fields (dates, PDF, XML) separately with error handling
+- Never rollback after HKA succeeds
+- Added multi-level fallback: try all fields → try critical only → log for manual recovery
+
+**File Modified:** `isfehka/models/account_move.py`
+```python
+# Save critical data FIRST
+try:
+    self.write({
+        'hka_status': 'sent',
+        'hka_cufe': result['data'].get('cufe', ''),
+        'hka_qr': result['data'].get('qr', ''),
+        'hka_nro_protocolo_autorizacion': result['data'].get('nroProtocoloAutorizacion', ''),
+        'hka_message': _('Documento enviado exitosamente'),
+    })
+    self.env.cr.commit()  # Commit immediately
+except Exception as e:
+    # Fallback: save at minimum the CUFE
+    _logger.critical(f"FAILED TO SAVE CUFE - MANUAL RECOVERY NEEDED")
+
+# Then try optional fields separately
+try:
+    # Parse and save date
+    self.write({'hka_fecha_recepcion_dgi': fecha_recepcion})
+except Exception as e:
+    _logger.warning(f"Could not save date - Continuing")
+    # Don't fail - critical data already saved
+```
+
 ## Version Updates
-- **isfehka**: `1.0.15` → `1.0.16`
+- **isfehka**: `1.0.15` → `1.0.17` (critical data loss fix)
 - **isfehka_cafe**: `17.0.1.0.0` → `17.0.1.0.1`
 
 ## Testing Checklist
