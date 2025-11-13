@@ -1,12 +1,12 @@
 /** @odoo-module */
 
-import { PosOrder } from "@point_of_sale/app/models/pos_order";
+import { Order } from "@point_of_sale/app/store/models";
 import { patch } from "@web/core/utils/patch";
 
 
 console.log("[ISFEHKA CAFE] Loading model patches for Odoo 17");
 
-patch(PosOrder.prototype, {
+patch(Order.prototype, {
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
         console.log("[ISFEHKA CAFE] Exporting order as JSON:", {
