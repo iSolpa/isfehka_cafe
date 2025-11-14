@@ -81,37 +81,10 @@ patch(Order.prototype, {
         this.tipo_documento_name = json.tipo_documento_name || (this.tipo_documento ? tipoDocumentoMap[this.tipo_documento] || '' : '');
     },
 
-    async export_for_printing() {
-        // Call parent's export_for_printing - it might be async too
-        const result = await super.export_for_printing(...arguments);
-        
-        // Ensure result has proper structure
+    export_for_printing() {
+        const result = super.export_for_printing(...arguments);
         if (!result) {
-            console.error("[ISFEHKA CAFE] export_for_printing returned null/undefined from parent");
             return result;
-        }
-        
-        // If order has server_id but no CUFE, try to fetch it from backend
-        if (this.server_id && !this.hka_cufe) {
-            console.log("[ISFEHKA CAFE] Order has server_id but no CUFE, fetching from backend...");
-            try {
-                const orders = await this.env.services.orm.call(
-                    'pos.order',
-                    'read',
-                    [[this.server_id], ['hka_cufe', 'hka_cufe_qr', 'hka_nro_protocolo_autorizacion', 'hka_fecha_recepcion_dgi', 'hka_tipo_documento']]
-                );
-                
-                if (orders && orders.length > 0 && orders[0].hka_cufe) {
-                    console.log("[ISFEHKA CAFE] Retrieved CUFE from backend:", orders[0].hka_cufe);
-                    this.hka_cufe = orders[0].hka_cufe;
-                    this.hka_cufe_qr = orders[0].hka_cufe_qr;
-                    this.hka_nro_protocolo_autorizacion = orders[0].hka_nro_protocolo_autorizacion;
-                    this.hka_fecha_recepcion_dgi = orders[0].hka_fecha_recepcion_dgi;
-                    this.hka_tipo_documento = orders[0].hka_tipo_documento;
-                }
-            } catch (error) {
-                console.warn("[ISFEHKA CAFE] Could not fetch CUFE from backend:", error);
-            }
         }
         
         // Add tipo_documento for transaction type display (from HKA integration)
