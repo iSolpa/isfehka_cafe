@@ -53,7 +53,7 @@
                         No. 201-9719 de 12/10/2021</div>
                     
                     <!-- Separator line -->
-                    <div class="pos-receipt-right-align" style="margin-top: 8px;">--------------------</div>
+                    <div class="pos-receipt-right-align" style="margin-top: 8px;"></div>
                 </div>
                 
                 <!-- Add custom footer text after CAFE section -->
