@@ -57,5 +57,18 @@
                 </div>
             </t>
         </xpath>
+        
+        <!-- Move custom footer text to appear after CAFE section -->
+        <xpath expr="//div[hasclass('pos-receipt-center-align')]" position="replace"/>
+        <xpath expr="//div[@class='after-footer']" position="after">
+            <t t-set="footer_text" t-value="props.data.footer or props.data.footer_html or ''"/>
+            <t t-if="footer_text">
+                <div class="pos-receipt-center-align" style="white-space:pre-line">
+                    <br/>
+                    <t t-esc="footer_text"/>
+                    <br/><br/>
+                </div>
+            </t>
+        </xpath>
     </t>
 </templates>
