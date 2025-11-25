@@ -17,22 +17,4 @@
         </div>
       </xpath>
     </template>
-
-    <!-- Also inherit for credit notes specifically -->
-    <template id="report_invoice_cafe_with_payments"
-              inherit_id="account.report_invoice_document_with_payments">
-      <xpath expr="." position="inside">
-        <div t-if="o.hka_cufe" style="text-align:center;font-size:10px;" class="mt16">
-          <strong>COMPROBANTE AUXILIAR DE FACTURA ELECTRÓNICA (C.A.F.E.)</strong><br/>
-          RUC <t t-esc="o.company_id.vat"/> – <t t-esc="o.company_id.name"/><br/>
-          Fact No: <t t-esc="o.numero_documento_fiscal"/>   Serie: <t t-esc="o._get_hka_branch()"/>-<t t-esc="o._get_hka_pos_code()"/><br/>
-          Emisión: <t t-esc="format_date(o.invoice_date)"/> <t t-esc="format_datetime(o.hka_fecha_recepcion_dgi or o.create_date)"/><br/>
-          CUFE: <t t-esc="o.hka_cufe"/><br/>
-          <img t-if="o.hka_cufe_qr_image"
-               t-att-src="image_data_uri(o.hka_cufe_qr_image)"
-               style="width:110px;height:110px;margin-top:4px;"/><br/>
-          Valide su factura escaneando el código o en la web de la DGI.
-        </div>
-      </xpath>
-    </template>
 </odoo>
