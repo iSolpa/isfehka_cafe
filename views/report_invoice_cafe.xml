@@ -8,7 +8,7 @@
           <strong>COMPROBANTE AUXILIAR DE FACTURA ELECTRÓNICA (C.A.F.E.)</strong><br/>
           RUC <t t-esc="o.company_id.vat"/> – <t t-esc="o.company_id.name"/><br/>
           Fact No: <t t-esc="o.numero_documento_fiscal"/>   Serie: <t t-esc="o._get_hka_branch()"/>-<t t-esc="o._get_hka_pos_code()"/><br/>
-          Emisión: <t t-esc="format_date(o.invoice_date)"/> <t t-esc="format_datetime(o.hka_fecha_recepcion_dgi or o.create_date)"/><br/>
+          Emisión: <span t-field="o.invoice_date"/> <span t-field="o.hka_fecha_recepcion_dgi" t-options="{'widget': 'datetime'}" t-if="o.hka_fecha_recepcion_dgi"/><span t-field="o.create_date" t-options="{'widget': 'datetime'}" t-if="not o.hka_fecha_recepcion_dgi"/><br/>
           CUFE: <t t-esc="o.hka_cufe"/><br/>
           <img t-if="o.hka_cufe_qr_image"
                t-att-src="image_data_uri(o.hka_cufe_qr_image)"

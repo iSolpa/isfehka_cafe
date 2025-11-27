@@ -50,10 +50,6 @@ class AccountMove(models.Model):
         if not self.hka_cufe:
             return
             
-        # Force computation of QR image before syncing
-        self.flush_recordset()
-        self._compute_hka_cufe_qr_image()
-        
         # Find POS orders that reference this invoice
         pos_orders = self.env['pos.order'].search([('account_move', '=', self.id)])
         
@@ -66,9 +62,7 @@ class AccountMove(models.Model):
                     'hka_fecha_recepcion_dgi': self.hka_fecha_recepcion_dgi,
                     'hka_tipo_documento': self.tipo_documento,  # Add document type for CAFE display
                 })
-                # Commit immediately so frontend receives the data
-                self.env.cr.commit()
-                _logger.info(f"[ISFEHKA CAFE] Synced and committed CUFE data to {len(pos_orders)} POS orders for invoice {self.name}")
+                _logger.info(f"[ISFEHKA CAFE] Synced CUFE data to {len(pos_orders)} POS orders for invoice {self.name}")
             except Exception as e:
                 # Fields may not exist yet if pos_order module hasn't been updated
                 _logger.warning(f"[ISFEHKA CAFE] Could not sync CUFE data to POS orders: {e}")
