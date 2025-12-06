@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'ISFEHKA CAFE - Panama DGI Receipt Extension',
-    'version': '18.0.1.0.0',
+    'version': '19.0.1.0.0',
     'category': 'Accounting/Localizations',
     'summary': 'Panama DGI CAFE (Comprobante Auxiliar de Factura Electrónica) generation for receipts',
     'description': """
@@ -33,6 +33,7 @@
     'assets': {
         'point_of_sale._assets_pos': [
             'isfehka_cafe/static/src/js/pos_order_cufe.js',
+            'isfehka_cafe/static/src/js/receipt_screen_cafe.js',
             'isfehka_cafe/static/src/xml/pos_ticket_cafe.xml',
         ],
     },
