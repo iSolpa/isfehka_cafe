@@ -1,35 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- isfehka_cafe/views/report_invoice_cafe.xml -->
-    
-    <!-- CAFE section template - reusable component -->
-    <template id="cafe_section">
-        <div t-if="o.hka_cufe" style="text-align:center;font-size:10px;" class="mt16">
+
+    <!-- Inherit main invoice document (used for PDF generation from Accounting) -->
+    <template id="report_invoice_cafe"
+              inherit_id="account.report_invoice_document">
+      <xpath expr="//div[hasclass('page')]" position="inside">
+        <div t-if="o.hka_cufe" style="text-align:center;font-size:10px;" class="mt-4 pt-3 border-top">
           <strong>COMPROBANTE AUXILIAR DE FACTURA ELECTRÓNICA (C.A.F.E.)</strong><br/>
           RUC <t t-esc="o.company_id.vat"/> – <t t-esc="o.company_id.name"/><br/>
           Fact No: <t t-esc="o.numero_documento_fiscal"/>   Serie: <t t-esc="o._get_hka_branch()"/>-<t t-esc="o._get_hka_pos_code()"/><br/>
           Emisión: <t t-out="o.invoice_date" t-options='{"widget": "date"}'/> <t t-out="o.hka_fecha_recepcion_dgi or o.create_date" t-options='{"widget": "datetime"}'/><br/>
           CUFE: <t t-esc="o.hka_cufe"/><br/>
           <img t-if="o.hka_cufe_qr_image"
-               t-att-src="'data:image/png;base64,%s' % o.hka_cufe_qr_image.decode('utf-8') if o.hka_cufe_qr_image else ''"
+               t-att-src="image_data_uri(o.hka_cufe_qr_image)"
                style="width:110px;height:110px;margin-top:4px;"/><br/>
           Valide su factura escaneando el código o en la web de la DGI.
         </div>
-    </template>
-    
-    <!-- Inherit main invoice document (used for PDF generation) -->
-    <template id="report_invoice_cafe"
-              inherit_id="account.report_invoice_document">
-      <xpath expr="." position="inside">
-        <t t-call="isfehka_cafe.cafe_section"/>
-      </xpath>
-    </template>
-    
-    <!-- Inherit invoice preview (used for Send Invoice dialog) -->
-    <template id="report_invoice_cafe_preview"
-              inherit_id="account.report_invoice_document_preview">
-      <xpath expr="." position="inside">
-        <t t-call="isfehka_cafe.cafe_section"/>
       </xpath>
     </template>
 </odoo>
