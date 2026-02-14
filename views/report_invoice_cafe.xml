@@ -30,6 +30,11 @@
                   <td>Número: <t t-esc="o.numero_documento_fiscal"/></td>
                 </tr>
                 <tr>
+                  <td colspan="2" style="word-break:break-all; font-family:monospace; font-size:9px; padding-top:2px;">
+                    CUFE: <t t-esc="o.hka_cufe"/>
+                  </td>
+                </tr>
+                <tr>
                   <td style="padding-right:30px;">Fecha: <t t-out="o.invoice_date" t-options='{"widget": "date"}'/></td>
                   <td>Hora: <t t-if="o.hka_fecha_recepcion_dgi" t-out="o.hka_fecha_recepcion_dgi" t-options='{"widget": "datetime", "format": "HH:mm:ss"}'/></td>
                 </tr>
@@ -65,25 +70,6 @@
           </div>
 
           <hr style="margin:4px 0 12px 0;"/>
-        </div>
-      </xpath>
-
-      <!-- ============================================================
-           CUFE as document title — replaces Odoo invoice number
-           ============================================================ -->
-      <xpath expr="//span[@t-field='o.name']" position="replace">
-        <span t-if="o.hka_cufe" t-esc="o.hka_cufe"
-              style="font-size:11px; word-break:break-all; font-family:monospace;"/>
-        <span t-elif="o.name and o.name != '/'" t-field="o.name"/>
-      </xpath>
-
-      <!-- ============================================================
-           Odoo invoice number — added to informations row
-           ============================================================ -->
-      <xpath expr="//div[@id='informations']" position="inside">
-        <div class="col" t-if="o.hka_cufe and o.name and o.name != '/'" name="odoo_ref">
-          <strong>Ref. Interna</strong>
-          <div t-field="o.name"/>
         </div>
       </xpath>
 
