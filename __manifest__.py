@@ -33,7 +33,6 @@
     'assets': {
         'point_of_sale._assets_pos': [
             'isfehka_cafe/static/src/js/pos_order_cufe.js',
-            'isfehka_cafe/static/src/js/receipt_screen_cafe.js',
             'isfehka_cafe/static/src/xml/pos_ticket_cafe.xml',
         ],
     },

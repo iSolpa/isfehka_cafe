@@ -1,7 +1,9 @@
 /** @odoo-module */
 
 import { Order } from "@point_of_sale/app/store/models";
+import { ReceiptScreen } from "@point_of_sale/app/screens/receipt_screen/receipt_screen";
 import { patch } from "@web/core/utils/patch";
+import { onWillStart } from "@odoo/owl";
 
 
 console.log("[ISFEHKA CAFE] Loading model patches for Odoo 17");
@@ -155,5 +157,54 @@ patch(Order.prototype, {
                 <div style="font-size: 8px; margin-top: 3px;">Verifique en DGI Panamá</div>
             </div>
         `;
+    },
+});
+
+// Map for document type display names
+const TIPO_DOCUMENTO_MAP = {
+    '01': 'Factura de Operación Interna',
+    '02': 'Factura de Importación',
+    '03': 'Factura de Exportación',
+    '04': 'Nota de Crédito',
+    '05': 'Nota de Débito',
+    '06': 'Nota de Crédito Genérica',
+    '07': 'Nota de Débito Genérica',
+    '08': 'Factura de Zona Franca',
+    '09': 'Factura de Reembolso'
+};
+
+// Patch ReceiptScreen to fetch CUFE data before receipt renders
+console.log("[ISFEHKA CAFE] Loading ReceiptScreen patch for CUFE pre-fetch");
+patch(ReceiptScreen.prototype, {
+    setup() {
+        super.setup();
+        console.log("[ISFEHKA CAFE] ReceiptScreen setup - registering onWillStart for CUFE");
+        onWillStart(async () => {
+            try {
+                const order = this.currentOrder;
+                console.log("[ISFEHKA CAFE] onWillStart - order:", order?.name, "hka_cufe:", order?.hka_cufe);
+                if (order && order.name && !order.hka_cufe) {
+                    console.log("[ISFEHKA CAFE] Fetching CUFE via get_cufe_data for:", order.name);
+                    const data = await this.orm.call(
+                        "pos.order",
+                        "get_cufe_data",
+                        [order.name]
+                    );
+                    console.log("[ISFEHKA CAFE] get_cufe_data response:", data);
+                    if (data && data.hka_cufe) {
+                        order.hka_cufe = data.hka_cufe;
+                        order.hka_cufe_qr = data.hka_cufe_qr;
+                        order.hka_nro_protocolo_autorizacion = data.hka_nro_protocolo_autorizacion;
+                        order.hka_fecha_recepcion_dgi = data.hka_fecha_recepcion_dgi;
+                        order.hka_tipo_documento = data.hka_tipo_documento;
+                        order.hka_tipo_documento_name = data.hka_tipo_documento ?
+                            TIPO_DOCUMENTO_MAP[data.hka_tipo_documento] || '' : '';
+                        console.log("[ISFEHKA CAFE] CUFE data loaded successfully:", order.hka_cufe);
+                    }
+                }
+            } catch (e) {
+                console.warn("[ISFEHKA CAFE] Could not preload CUFE for receipt:", e);
+            }
+        });
     },
 });
