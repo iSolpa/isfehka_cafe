@@ -2,6 +2,7 @@
 
 import { Order } from "@point_of_sale/app/store/models";
 import { ReceiptScreen } from "@point_of_sale/app/screens/receipt_screen/receipt_screen";
+import { PaymentScreen } from "@point_of_sale/app/screens/payment_screen/payment_screen";
 import { patch } from "@web/core/utils/patch";
 import { onWillStart } from "@odoo/owl";
 
@@ -160,6 +161,37 @@ patch(Order.prototype, {
     },
 });
 
+// Patch PaymentScreen to ensure CUFE is loaded before ReceiptScreen is shown.
+// This guarantees first render/print gets CAFE data even if other receipt patches run first.
+console.log("[ISFEHKA CAFE] Loading PaymentScreen patch for CUFE pre-fetch");
+patch(PaymentScreen.prototype, {
+    async afterOrderValidation() {
+        const order = this.currentOrder || this.pos.get_order();
+        const orm = this.orm || this.env.services.orm;
+        try {
+            if (order && order.name && !order.hka_cufe) {
+                console.log("[ISFEHKA CAFE] PaymentScreen preload - fetching CUFE for:", order.name);
+                const data = await orm.call("pos.order", "get_cufe_data", [order.name]);
+                console.log("[ISFEHKA CAFE] PaymentScreen preload get_cufe_data response:", data);
+                if (data && data.hka_cufe) {
+                    order.hka_cufe = data.hka_cufe;
+                    order.hka_cufe_qr = data.hka_cufe_qr;
+                    order.hka_nro_protocolo_autorizacion = data.hka_nro_protocolo_autorizacion;
+                    order.hka_fecha_recepcion_dgi = data.hka_fecha_recepcion_dgi;
+                    order.hka_tipo_documento = data.hka_tipo_documento;
+                    order.hka_tipo_documento_name = data.hka_tipo_documento
+                        ? TIPO_DOCUMENTO_MAP[data.hka_tipo_documento] || ""
+                        : "";
+                    console.log("[ISFEHKA CAFE] PaymentScreen preload loaded CUFE:", order.hka_cufe);
+                }
+            }
+        } catch (e) {
+            console.warn("[ISFEHKA CAFE] PaymentScreen preload could not fetch CUFE:", e);
+        }
+        return await super.afterOrderValidation(...arguments);
+    },
+});
+
 // Map for document type display names
 const TIPO_DOCUMENTO_MAP = {
     '01': 'Factura de Operación Interna',
@@ -180,12 +212,13 @@ patch(ReceiptScreen.prototype, {
         super.setup();
         console.log("[ISFEHKA CAFE] ReceiptScreen setup - registering onWillStart for CUFE");
         onWillStart(async () => {
+            const orm = this.orm || this.env.services.orm;
             try {
                 const order = this.currentOrder;
                 console.log("[ISFEHKA CAFE] onWillStart - order:", order?.name, "hka_cufe:", order?.hka_cufe);
                 if (order && order.name && !order.hka_cufe) {
                     console.log("[ISFEHKA CAFE] Fetching CUFE via get_cufe_data for:", order.name);
-                    const data = await this.orm.call(
+                    const data = await orm.call(
                         "pos.order",
                         "get_cufe_data",
                         [order.name]
