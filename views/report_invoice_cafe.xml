@@ -7,69 +7,78 @@
               inherit_id="account.report_invoice_document">
 
       <!-- ============================================================
-           CAFE HEADER — placed at the top, before partner addresses
+           CAFE HEADER — placed at the absolute top of page content
            ============================================================ -->
-      <xpath expr="//t[@t-set='forced_vat']" position="after">
+      <xpath expr="//div[hasclass('page')]/*[1]" position="before">
         <div t-if="o.hka_cufe" style="font-size:10px;">
+          <!-- Hide default account invoice heading/address/info sections for CAFE docs -->
+          <style>
+            .header,
+            div[name='invoice_address'],
+            div[name='shipping_address'],
+            div[name='no_shipping'],
+            #informations,
+            .page > h2.mt-4 {
+              display: none !important;
+            }
+          </style>
 
           <!-- DGI Title Block -->
           <div class="text-center mb-2">
             <div style="font-size:14px; font-weight:bold;">DGI</div>
-            <div style="font-size:11px; font-weight:bold;">Comprobante Auxiliar de Factura Electrónica</div>
-            <div style="font-size:11px; font-weight:bold;">
+            <div style="font-size:18px; font-weight:bold; line-height:1.2;">Comprobante Auxiliar de Factura Electrónica</div>
+            <div style="font-size:13px; font-weight:bold; margin-top:6px;">
               <span t-field="o.tipo_documento"/>
             </div>
           </div>
 
-          <!-- Document Details + QR Code Row -->
+          <!-- Document identity and QR -->
           <div class="row mb-2" style="font-size:10px;">
-            <div class="col-8">
-              <table style="font-size:10px; line-height:1.6;">
-                <tr>
-                  <td style="padding-right:30px;">Tipo: <span t-field="o.tipo_documento"/></td>
-                  <td>Número: <t t-esc="o.numero_documento_fiscal"/></td>
-                </tr>
-                <tr>
-                  <td colspan="2" style="word-break:break-all; font-family:monospace; font-size:9px; padding-top:2px;">
-                    CUFE: <t t-esc="o.hka_cufe"/>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding-right:30px;">Fecha: <span t-field="o.invoice_date"/></td>
-                  <td>Hora: <span t-if="o.hka_fecha_recepcion_dgi" t-field="o.hka_fecha_recepcion_dgi" t-options='{"widget": "datetime", "format": "HH:mm:ss"}'/></td>
-                </tr>
-              </table>
-
-              <!-- Authorization -->
-              <div class="mt-2" t-if="o.hka_nro_protocolo_autorizacion">
-                Autorización DGI: <t t-esc="o.hka_nro_protocolo_autorizacion"/>
-                de <span t-field="o.hka_fecha_recepcion_dgi" t-options='{"widget": "datetime"}'/>
+            <div class="col-8" style="line-height:1.7;">
+              <div><strong>Número:</strong> <t t-esc="o.numero_documento_fiscal"/></div>
+              <div style="word-break:break-all; font-family:monospace; font-size:9px;"><strong>CUFE:</strong> <t t-esc="o.hka_cufe"/></div>
+              <div t-if="o.hka_nro_protocolo_autorizacion"><strong>Protocolo de autorización:</strong> <t t-esc="o.hka_nro_protocolo_autorizacion"/></div>
+              <div>
+                <strong>Fecha de emisión:</strong>
+                <span t-if="o.hka_fecha_recepcion_dgi" t-field="o.hka_fecha_recepcion_dgi" t-options='{"widget": "datetime"}'/>
+                <span t-if="not o.hka_fecha_recepcion_dgi" t-field="o.create_date" t-options='{"widget": "datetime"}'/>
               </div>
-
-              <!-- CUFE Consultation -->
-              <div class="mt-1">
-                Consulte en https://dgi-fep.mef.gob.pa/Consultas/FacturasPorCUFE usando el CUFE:
-              </div>
-              <div style="word-break:break-all; font-family:monospace; font-size:9px;">
-                <t t-esc="o.hka_cufe"/>
-              </div>
-              <div class="mt-1">o escaneando el código QR</div>
-
-              <!-- Branch / POS -->
-              <div class="mt-2">
-                Sucursal: <t t-esc="o._get_hka_branch()"/> – Pto Fact: <t t-esc="o._get_hka_pos_code()"/>
+              <div>
+                <strong>Consulte por CUFE en:</strong>
+                https://dgi-fep.mef.gob.pa/Consultas/FacturasPorCUFE
               </div>
             </div>
 
-            <!-- QR Code (right column) -->
-            <div class="col-4 text-center pt-2">
+            <div class="col-4 text-center pt-1">
               <img t-if="o.hka_cufe_qr_image"
                    t-att-src="image_data_uri(o.hka_cufe_qr_image)"
-                   style="width:130px; height:130px;"/>
+                   style="width:120px; height:120px;"/>
             </div>
           </div>
 
-          <hr style="margin:4px 0 12px 0;"/>
+          <!-- Issuer / Receiver blocks -->
+          <div class="row mb-2" style="font-size:10px;">
+            <div class="col-6" style="background:#efefef; padding:8px 10px;">
+              <div><strong>Emisor:</strong> <t t-esc="o.company_id.name"/></div>
+              <div><strong>RUC:</strong> <t t-esc="o.company_id.vat or ''"/></div>
+              <div><strong>Teléfono:</strong> <t t-esc="o.company_id.phone or ''"/></div>
+              <div><strong>Dirección:</strong> <t t-esc="o.company_id.partner_id.contact_address or ''"/></div>
+            </div>
+            <div class="col-6" style="background:#efefef; padding:8px 10px;">
+              <div><strong>Receptor:</strong> <t t-esc="o.partner_id.name or ''"/></div>
+              <div><strong>Tipo:</strong> Consumidor final</div>
+              <div><strong>RUC:</strong> <t t-esc="o.partner_id.vat or ''"/></div>
+              <div><strong>Teléfono:</strong> <t t-esc="o.partner_id.phone or ''"/></div>
+              <div><strong>Dirección:</strong> <t t-esc="o.partner_id.contact_address or ''"/></div>
+            </div>
+          </div>
+
+          <div class="mb-2" style="font-size:11px;">
+            <strong>Sucursal:</strong> <t t-esc="o._get_hka_branch()"/> -
+            <strong>Pto Fact:</strong> <t t-esc="o._get_hka_pos_code()"/>
+          </div>
+
+          <hr style="margin:6px 0 12px 0;"/>
         </div>
       </xpath>
 
