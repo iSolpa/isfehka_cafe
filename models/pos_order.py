@@ -67,8 +67,11 @@ class PosOrder(models.Model):
                     })
                     _logger.info("[ISFEHKA CAFE] Synced CUFE data to pos.order")
                 
-                # Return the data (decode binary for JS)
-                qr_data = qr_image.decode('utf-8') if qr_image else False
+                # Return the data as string for JS (handle both bytes and str)
+                if qr_image:
+                    qr_data = qr_image.decode('utf-8') if isinstance(qr_image, bytes) else qr_image
+                else:
+                    qr_data = False
                 return {
                     'hka_cufe': invoice.hka_cufe,
                     'hka_cufe_qr': qr_data,
