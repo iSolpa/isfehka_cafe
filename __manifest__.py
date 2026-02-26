@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'ISFEHKA CAFE - Panama DGI Receipt Extension',
-    'version': '19.0.1.0.4',
+    'version': '19.0.1.0.5',
     'category': 'Accounting/Localizations',
     'summary': 'Panama DGI CAFE (Comprobante Auxiliar de Factura Electrónica) generation for receipts',
     'description': """
