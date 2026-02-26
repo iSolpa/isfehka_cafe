@@ -14,6 +14,12 @@
           <!-- Hide default account invoice heading/address/info sections for CAFE docs -->
           <style>
             .header,
+            div[name='address'],
+            div[name='information_block'],
+            .address,
+            .information_block,
+            .o_report_layout_standard .article .row > .col-5.offset-1,
+            .o_report_layout_standard .article .row > .offset-1.col-5,
             div[name='invoice_address'],
             div[name='shipping_address'],
             div[name='no_shipping'],
