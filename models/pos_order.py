@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import pytz
+
 from odoo import models, fields, api
 
 class PosOrder(models.Model):
@@ -19,6 +21,14 @@ class PosOrder(models.Model):
         readonly=True,
         help='Tipo de documento fiscal de la factura relacionada'
     )
+
+    @api.model
+    def _hka_panama_wall_clock(self, value):
+        """UTC Datetime -> naive Panama time, for the ticket that prints it raw (#2004)."""
+        if not value:
+            return False
+        panama = pytz.timezone('America/Panama')
+        return pytz.utc.localize(value).astimezone(panama).replace(tzinfo=None)
 
     @api.model
     def get_cufe_data(self, pos_reference):
@@ -62,7 +72,7 @@ class PosOrder(models.Model):
                         'hka_cufe': invoice.hka_cufe,
                         'hka_cufe_qr': qr_image,
                         'hka_nro_protocolo_autorizacion': invoice.hka_nro_protocolo_autorizacion,
-                        'hka_fecha_recepcion_dgi': invoice.hka_fecha_recepcion_dgi,
+                        'hka_fecha_recepcion_dgi': self._hka_panama_wall_clock(invoice.hka_fecha_recepcion_dgi),
                         'hka_tipo_documento': invoice.tipo_documento,
                     })
                     _logger.info("[ISFEHKA CAFE] Synced CUFE data to pos.order")
@@ -76,7 +86,8 @@ class PosOrder(models.Model):
                     'hka_cufe': invoice.hka_cufe,
                     'hka_cufe_qr': qr_data,
                     'hka_nro_protocolo_autorizacion': invoice.hka_nro_protocolo_autorizacion,
-                    'hka_fecha_recepcion_dgi': str(invoice.hka_fecha_recepcion_dgi) if invoice.hka_fecha_recepcion_dgi else False,
+                    # The order's own copy is already Panama time, whatever the invoice row holds (#2004)
+                    'hka_fecha_recepcion_dgi': str(order.hka_fecha_recepcion_dgi) if order.hka_fecha_recepcion_dgi else False,
                     'hka_tipo_documento': invoice.tipo_documento,
                 }
         

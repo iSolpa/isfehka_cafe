@@ -46,8 +46,8 @@
               <div t-if="o.hka_nro_protocolo_autorizacion"><strong>Protocolo de autorización:</strong> <t t-esc="o.hka_nro_protocolo_autorizacion"/></div>
               <div>
                 <strong>Fecha de emisión:</strong>
-                <span t-if="o.hka_fecha_recepcion_dgi" t-field="o.hka_fecha_recepcion_dgi" t-options='{"widget": "datetime"}'/>
-                <span t-if="not o.hka_fecha_recepcion_dgi" t-field="o.create_date" t-options='{"widget": "datetime"}'/>
+                <span t-if="o.hka_fecha_recepcion_dgi" t-field="o.hka_fecha_recepcion_dgi" t-options='{"widget": "datetime", "tz_name": "America/Panama"}'/>
+                <span t-if="not o.hka_fecha_recepcion_dgi" t-field="o.create_date" t-options='{"widget": "datetime", "tz_name": "America/Panama"}'/>
               </div>
               <div>
                 <strong>Consulte por CUFE en:</strong>
@@ -72,7 +72,7 @@
             </div>
             <div class="col-6" style="background:#efefef; padding:8px 10px;">
               <div><strong>Receptor:</strong> <t t-esc="o.partner_id.name or ''"/></div>
-              <div><strong>Tipo:</strong> Consumidor final</div>
+              <div><strong>Tipo:</strong> <span t-field="o.partner_id.tipo_cliente_fe"/></div>
               <div><strong>RUC:</strong> <t t-esc="o.partner_id.vat or ''"/></div>
               <div><strong>Teléfono:</strong> <t t-esc="o.partner_id.phone or ''"/></div>
               <div><strong>Dirección:</strong> <t t-esc="o.partner_id.contact_address or ''"/></div>
