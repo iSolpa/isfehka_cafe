@@ -59,7 +59,8 @@ class AccountMove(models.Model):
                     'hka_cufe': self.hka_cufe,
                     'hka_cufe_qr': self.hka_cufe_qr_image,  # Use generated QR image from official URL
                     'hka_nro_protocolo_autorizacion': self.hka_nro_protocolo_autorizacion,
-                    'hka_fecha_recepcion_dgi': self.hka_fecha_recepcion_dgi,
+                    # pos.order keeps Panama wall-clock time: the ticket prints it raw (#2004)
+                    'hka_fecha_recepcion_dgi': self.env['pos.order']._hka_panama_wall_clock(self.hka_fecha_recepcion_dgi),
                     'hka_tipo_documento': self.tipo_documento,  # Add document type for CAFE display
                 })
                 _logger.info(f"[ISFEHKA CAFE] Synced CUFE data to {len(pos_orders)} POS orders for invoice {self.name}")
