@@ -21,20 +21,25 @@
             .page > h2.mt-4 {
               display: none !important;
             }
+            /* Compact rows so a typical POS invoice (lines + totals) fits on one page */
+            .o_main_table td, .o_main_table th,
+            #total table td { padding-top: 3px !important; padding-bottom: 3px !important; }
+            #right-elements { margin-top: 0.75rem !important; }
+            td[name='td_quantity'] { white-space: nowrap; }
           </style>
 
           <!-- DGI Title Block -->
-          <div class="text-center mb-2">
-            <div style="font-size:14px; font-weight:bold;">DGI</div>
-            <div style="font-size:18px; font-weight:bold; line-height:1.2;">Comprobante Auxiliar de Factura Electrónica</div>
-            <div style="font-size:13px; font-weight:bold; margin-top:6px;">
+          <div class="text-center mb-1">
+            <div style="font-size:12px; font-weight:bold;">DGI</div>
+            <div style="font-size:16px; font-weight:bold; line-height:1.2;">Comprobante Auxiliar de Factura Electrónica</div>
+            <div style="font-size:12px; font-weight:bold; margin-top:2px;">
               <span t-field="o.tipo_documento"/>
             </div>
           </div>
 
           <!-- Document identity and QR -->
-          <div class="row mb-2" style="font-size:10px;">
-            <div class="col-8" style="line-height:1.7;">
+          <div class="row mb-1" style="font-size:10px;">
+            <div class="col-8" style="line-height:1.5;">
               <div><strong>Número:</strong> <t t-esc="o.numero_documento_fiscal"/></div>
               <div style="word-break:break-all; font-family:monospace; font-size:9px;"><strong>CUFE:</strong> <t t-esc="o.hka_cufe"/></div>
               <div t-if="o.hka_nro_protocolo_autorizacion"><strong>Protocolo de autorización:</strong> <t t-esc="o.hka_nro_protocolo_autorizacion"/></div>
@@ -52,34 +57,64 @@
             <div class="col-4 text-center pt-1">
               <img t-if="o.hka_cufe_qr_image"
                    t-att-src="image_data_uri(o.hka_cufe_qr_image)"
-                   style="width:120px; height:120px;"/>
+                   style="width:95px; height:95px;"/>
             </div>
           </div>
 
           <!-- Issuer / Receiver blocks -->
-          <div class="row mb-2" style="font-size:10px;">
-            <div class="col-6" style="background:#efefef; padding:8px 10px;">
+          <div class="row mb-1" style="font-size:10px;">
+            <div class="col-6" style="background:#efefef; padding:6px 10px;">
               <div><strong>Emisor:</strong> <t t-esc="o.company_id.name"/></div>
               <div><strong>RUC:</strong> <t t-esc="o.company_id.vat or ''"/></div>
               <div><strong>Teléfono:</strong> <t t-esc="o.company_id.phone or ''"/></div>
               <div><strong>Dirección:</strong> <t t-esc="o.company_id.partner_id.contact_address or ''"/></div>
             </div>
-            <div class="col-6" style="background:#efefef; padding:8px 10px;">
+            <div class="col-6" style="background:#efefef; padding:6px 10px;">
               <div><strong>Receptor:</strong> <t t-esc="o.partner_id.name or ''"/></div>
               <div><strong>Tipo:</strong> <span t-field="o.partner_id.tipo_cliente_fe"/></div>
-              <div><strong>RUC:</strong> <t t-esc="o.partner_id.vat or ''"/></div>
+              <div><strong>RUC:</strong> <t t-esc="o.partner_id.ruc or o.partner_id.vat or ''"/>
+                <t t-if="o.partner_id.dv"> <strong>DV:</strong> <t t-esc="o.partner_id.dv"/></t></div>
               <div><strong>Teléfono:</strong> <t t-esc="o.partner_id.phone or ''"/></div>
               <div><strong>Dirección:</strong> <t t-esc="o.partner_id.contact_address or ''"/></div>
             </div>
           </div>
 
-          <div class="mb-2" style="font-size:11px;">
+          <div class="mb-1" style="font-size:10px;">
             <strong>Sucursal:</strong> <t t-esc="o._get_hka_branch()"/> -
             <strong>Pto Fact:</strong> <t t-esc="o._get_hka_pos_code()"/>
           </div>
 
-          <hr style="margin:6px 0 12px 0;"/>
+          <hr style="margin:4px 0 6px 0;"/>
         </div>
+      </xpath>
+
+      <!-- ============================================================
+           DISCOUNTS — make line discounts explicit (amount, not only %)
+           and summarise them above the totals, like the DGI CAFE does.
+           Only on documents sent to HKA (o.hka_cufe); amounts follow the
+           company's price basis (tax-excluded or tax-included price_unit).
+           ============================================================ -->
+      <xpath expr="//td[@name='td_discount']" position="inside">
+        <t t-if="o.hka_cufe and line.discount">
+          <br/><small class="text-muted text-nowrap">-<span t-out="line.quantity * line.price_unit * line.discount / 100.0"
+               t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></small>
+        </t>
+      </xpath>
+
+      <xpath expr="//div[@id='total']//t[@t-call='account.document_tax_totals']" position="before">
+        <t t-if="o.hka_cufe and display_discount">
+          <t t-set="cafe_prod_lines" t-value="o.invoice_line_ids.filtered(lambda l: l.display_type == 'product')"/>
+          <t t-set="cafe_gross" t-value="sum(l.quantity * l.price_unit for l in cafe_prod_lines)"/>
+          <t t-set="cafe_disc" t-value="sum(l.quantity * l.price_unit * l.discount / 100.0 for l in cafe_prod_lines)"/>
+          <tr>
+            <td>Precio antes de descuentos</td>
+            <td class="text-end"><span class="text-nowrap" t-out="cafe_gross" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+          </tr>
+          <tr>
+            <td>Descuentos</td>
+            <td class="text-end"><span class="text-nowrap">-<t t-out="cafe_disc" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></span></td>
+          </tr>
+        </t>
       </xpath>
 
       <!-- ============================================================

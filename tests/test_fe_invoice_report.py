@@ -69,3 +69,26 @@ class TestFeInvoiceReport(AccountTestInvoicingCommon):
         with patch.object(type(pos), 'search', return_value=order):
             data = pos.get_cufe_data('REF')
         self.assertEqual(data['hka_fecha_recepcion_dgi'], '2026-11-06 11:52:41')
+
+    def test_discounts_and_receptor_ruc_dv(self):
+        """Line discount amount, discount totals and receptor RUC/DV, only on HKA documents."""
+        self.partner_a.write({'ruc': '8-888-1234', 'dv': '42', 'vat': False})
+        move = self._invoice()
+        move.invoice_line_ids.write({'quantity': 2, 'price_unit': 50, 'discount': 10})
+        html = self._html(move)
+        self.assertIn('Precio antes de descuentos', html)
+        self.assertRegex(html, r'(?s)Descuentos</td>\s*<td[^>]*><span class="text-nowrap">-.{0,200}?10\.00')
+        self.assertRegex(html, r'(?s)<small class="text-muted text-nowrap">-.{0,200}?10\.00')
+        self.assertRegex(html, r'(?s)Precio antes de descuentos</td>.{0,300}?100\.00')
+        self.assertIn('8-888-1234', html)
+        self.assertRegex(html, r'DV:</strong>\s*42')
+
+        move.write({'hka_cufe': False})
+        html = self._html(move)
+        self.assertNotIn('Precio antes de descuentos', html)
+        self.assertNotIn('Descuentos</td>', html)
+        self.assertNotIn('text-muted text-nowrap">-', html)
+
+    def test_no_discount_rows_without_discount(self):
+        html = self._html(self._invoice())
+        self.assertNotIn('Precio antes de descuentos', html)
